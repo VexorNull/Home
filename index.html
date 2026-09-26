@@ -312,7 +312,7 @@
                 
                 const repos = await response.json();
                 
-                // Exclude the 'Home' repository itself and any profile readme repo from listing
+                // Exclude 'Home' repository and main profile repo
                 allProjects = repos.filter(repo => {
                     const name = repo.name.toLowerCase();
                     return name !== 'home' && name !== username.toLowerCase();
@@ -332,20 +332,34 @@
 
             container.innerHTML = '';
             projects.forEach(project => {
-                const title = project.name;
-                const desc = project.description || 'Custom web application workspace.';
-                const lang = project.language || 'Application';
+                const repoName = project.name;
                 
-                // Smart link routing: Handles both Vercel custom domains or GitHub Pages paths cleanly
-                // Automatically points to sub-directory live page if hosted on GH Pages under /repo-name/
-                const liveUrl = `https://${username}.github.io/${title}/`;
+                // Smart Heading Extraction: 
+                // Agar repo ki description mein '|' ya '-' se separated title ho, ya pure description ko title bana lo,
+                // Warna agar description nahi hai toh repository name ko clean capitalize karke show karein.
+                let displayTitle = repoName.replace(/-/g, ' ').replace(/_/g, ' ');
+                let displayDesc = 'Custom web application workspace.';
+
+                if (project.description) {
+                    // Agar description mein '|' hai, toh pehla hissa title aur baaki description ban jayega
+                    if (project.description.includes('|')) {
+                        const parts = project.description.split('|');
+                        displayTitle = parts[0].trim();
+                        displayDesc = parts.slice(1).join(' ').trim();
+                    } else {
+                        displayDesc = project.description;
+                    }
+                }
+
+                const lang = project.language || 'Application';
+                const liveUrl = `https://${username}.github.io/${repoName}/`;
 
                 const card = document.createElement('div');
                 card.className = 'project-card';
                 card.innerHTML = `
                     <div class="project-info">
-                        <h3><a href="${liveUrl}" target="_blank">${title}</a></h3>
-                        <p>${desc}</p>
+                        <h3><a href="${liveUrl}" target="_blank">${displayTitle}</a></h3>
+                        <p>${displayDesc}</p>
                     </div>
                     <div class="project-footer">
                         <span class="lang-badge">${lang}</span>
