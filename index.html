@@ -6,7 +6,7 @@
     <title>VEXORNULL | Central Command & Projects Hub</title>
     
     <!-- Favicon -->
-   <link rel="icon" type="image/png" href="https://vexornull.github.io/favicon/favicon.png">
+    <link rel="icon" type="image/png" href="https://github.com/vexornull.png">
 
     <!-- Advanced SEO & Meta Tags -->
     <meta name="title" content="VEXORNULL | Central Command & Projects Hub">
@@ -269,21 +269,6 @@
             box-shadow: 0 6px 20px var(--accent-glow);
         }
 
-        .action-btn.source-only {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            box-shadow: none;
-        }
-
-        .action-btn.source-only:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: none;
-            transform: none;
-        }
-
         .loader {
             grid-column: 1 / -1;
             text-align: center;
@@ -354,9 +339,10 @@
                 
                 const repos = await response.json();
                 
+                // STRICT FILTER: Sirf wohi repos ayengi jo public hain aur jinki GitHub Pages (has_pages) active hai!
                 allProjects = repos.filter(repo => {
                     const name = repo.name.toLowerCase();
-                    return name !== 'home' && name !== username.toLowerCase() && !repo.private;
+                    return name !== 'home' && name !== username.toLowerCase() && !repo.private && repo.has_pages;
                 });
                 
                 renderProjects(allProjects);
@@ -389,15 +375,7 @@
                 }
 
                 const lang = project.language || 'Application';
-                const isLiveDeployed = project.has_pages;
-                
-                const targetUrl = isLiveDeployed 
-                    ? `https://${username}.github.io/${repoName}/` 
-                    : project.html_url;
-                
-                const btnText = isLiveDeployed ? 'Launch App' : 'Source Code';
-                const btnIcon = isLiveDeployed ? 'fa-arrow-up-right-from-square' : 'fa-code';
-                const btnClass = isLiveDeployed ? 'action-btn' : 'action-btn source-only';
+                const liveUrl = `https://${username}.github.io/${repoName}/`;
 
                 const card = document.createElement('div');
                 card.className = 'project-card';
@@ -408,9 +386,9 @@
                     </div>
                     <div class="project-footer">
                         <span class="lang-badge">${lang}</span>
-                        <a href="${targetUrl}" target="_blank" class="${btnClass}">
-                            <span>${btnText}</span>
-                            <i class="fa-solid ${btnIcon}"></i>
+                        <a href="${liveUrl}" target="_blank" class="action-btn">
+                            <span>Launch App</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
                         </a>
                     </div>
                 `;
